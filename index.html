@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consulta de CEP — endereço, clima e mapa</title>
+  <meta name="description" content="Busque CEPs por número, rua, bairro ou cidade e veja o clima e o mapa da região.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <a class="brand" href="./" aria-label="Consulta de CEP">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="1" y="1" width="30" height="30" rx="8" fill="currentColor"/>
+          <path d="M16 7a6.5 6.5 0 0 0-6.5 6.5C9.5 18.4 16 25 16 25s6.5-6.6 6.5-11.5A6.5 6.5 0 0 0 16 7Zm0 8.7a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4Z" fill="#F2B705"/>
+        </svg>
+        <span>CEP<strong>Local</strong></span>
+      </a>
+      <span class="topbar__note">Dados: ViaCEP · Open-Meteo · Google Maps</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="hero">
+      <h1>Encontre qualquer CEP do Brasil e veja como é o lugar.</h1>
+      <p>Pesquise pelo número, pela rua, pelo bairro ou pela cidade. Escolha um resultado para ver o clima atual e o mapa.</p>
+    </section>
+
+    <section class="search" aria-labelledby="search-title">
+      <h2 id="search-title" class="sr-only">Pesquisar</h2>
+
+      <div class="tabs" role="tablist" aria-label="Tipo de busca">
+        <button class="tab is-active" role="tab" id="tab-cep"    aria-selected="true"  aria-controls="form-search" data-mode="cep">CEP</button>
+        <button class="tab"           role="tab" id="tab-rua"    aria-selected="false" aria-controls="form-search" data-mode="rua">Rua</button>
+        <button class="tab"           role="tab" id="tab-bairro" aria-selected="false" aria-controls="form-search" data-mode="bairro">Bairro</button>
+        <button class="tab"           role="tab" id="tab-cidade" aria-selected="false" aria-controls="form-search" data-mode="cidade">Cidade</button>
+      </div>
+
+      <form id="form-search" class="form" role="tabpanel" novalidate autocomplete="off">
+        <div class="field field--cep" data-for="cep">
+          <label for="cep">CEP</label>
+          <input id="cep" name="cep" type="text" inputmode="numeric" placeholder="45653-000" maxlength="9">
+        </div>
+
+        <div class="field field--uf" data-for="rua bairro cidade" hidden>
+          <label for="uf">Estado</label>
+          <select id="uf" name="uf">
+            <option value="">UF</option>
+          </select>
+        </div>
+
+        <div class="field field--city" data-for="rua bairro cidade" hidden>
+          <label for="cidade">Cidade</label>
+          <input id="cidade" name="cidade" type="text" placeholder="Ex.: Ilhéus">
+        </div>
+
+        <div class="field field--street" data-for="rua" hidden>
+          <label for="logradouro">Nome da rua</label>
+          <input id="logradouro" name="logradouro" type="text" placeholder="Ex.: Avenida Soares Lopes">
+        </div>
+
+        <div class="field field--street" data-for="bairro" hidden>
+          <label for="bairro">Nome do bairro</label>
+          <input id="bairro" name="bairro" type="text" placeholder="Ex.: Centro">
+        </div>
+
+        <button class="btn" type="submit" id="btn-search">
+          <span class="btn__label">Pesquisar</span>
+          <span class="spinner" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <p class="hint" id="hint" aria-live="polite"></p>
+    </section>
+
+    <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+    <section class="results" id="results" hidden>
+      <div class="results__list">
+        <div class="results__head">
+          <h2 id="results-title">Resultados</h2>
+          <input id="filter" class="filter" type="search" placeholder="Filtrar resultados" aria-label="Filtrar resultados" hidden>
+        </div>
+        <ul id="list" class="list"></ul>
+      </div>
+
+      <aside class="detail" id="detail" aria-live="polite">
+        <div class="detail__empty" id="detail-empty">
+          <p>Selecione um endereço para ver o clima e o mapa.</p>
+        </div>
+
+        <div id="detail-content" hidden>
+          <div class="stamp">
+            <span class="stamp__label">CEP</span>
+            <span class="stamp__value" id="d-cep">—</span>
+          </div>
+
+          <h3 id="d-street">—</h3>
+          <p class="detail__place" id="d-place">—</p>
+
+          <dl class="meta" id="d-meta"></dl>
+
+          <div class="card" id="weather">
+            <h4>Clima agora</h4>
+            <div id="weather-body" class="weather__body"></div>
+          </div>
+
+          <div class="card card--map">
+            <div class="card__head">
+              <h4>Mapa</h4>
+              <a id="d-maplink" class="link" href="#" target="_blank" rel="noopener">Abrir no Google Maps</a>
+            </div>
+            <div class="map">
+              <iframe id="d-map" title="Mapa da localização" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>Consulta de CEP feita com a API pública <a href="https://viacep.com.br/" target="_blank" rel="noopener">ViaCEP</a>. Clima por <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
